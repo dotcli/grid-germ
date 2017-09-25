@@ -1,100 +1,157 @@
 const paper = require('paper')
 
-paper.install(window);
-paper.setup('myCanvas');
-view.viewSize.set(1000, 1000)
+const VIEW_SIZE = 640
+paper.install(window)
+paper.setup('myCanvas')
+view.viewSize.set(VIEW_SIZE, VIEW_SIZE)
 var rect = new Path.Rectangle({
-    point: [0, 0],
-    size: [view.size.width, view.size.height],
+  point: [0, 0],
+  size: [VIEW_SIZE, VIEW_SIZE],
 });
 rect.sendToBack();
 rect.fillColor = 'black';
 
-const CELL_SIZE = 10
-const STROKE_WIDTH = 0.2
-const STROKE_COLOR = 'white'
-const memory = [
-  [0, 0]
-]
-new Path.Rectangle({
-  point: [
-    view.size.width / 2 + memory[0][0],
-    view.size.height / 2 + memory[0][1],
-  ],
-  size: [CELL_SIZE, CELL_SIZE],
-  strokeColor: STROKE_COLOR,
-  strokeWidth: STROKE_WIDTH,
-})
+const GRID_SIZE = 20
+const STROKE_WIDTH = 0.5
+const STROKE_COLOR = 'grey'
+// put half of all possible grids into memory
+// when drawing, half is reflected
+const NUM_ROW = VIEW_SIZE / GRID_SIZE
+const NUM_COL = VIEW_SIZE / GRID_SIZE
 
-function step() {
-  // pick adjacent unoccupied cell
-  let allAdjacents = []
-  for (let i = 0; i < memory.length; i++) {
-    const adjacents = getAdjacents(memory[i])
-    allAdjacents = allAdjacents.concat(adjacents)
-  }
-  
-  let uniqueAdjacents = []
-  for (let i = 0; i < allAdjacents.length; i++) {
-    const pos = allAdjacents[i]
-    const appearance = uniqueAdjacents.filter(el => el[0] === pos[0] && el[1] === pos[1])
-    if (appearance.length === 0) {
-      uniqueAdjacents.push(pos)
+// NOTE memory is obsolete;
+// tracking with record which tracks only the end
+// maybe this will be usefil in the future
+
+// const memory = new Array(NUM_ROW)
+// // fill them with falsehood
+// for(let rI = 0; rI < NUM_ROW; rI++) {
+//   memory[rI] = []
+//   for(let cI = 0; cI < NUM_COL / 2; cI++) {
+//     memory[rI].push(false)
+//   }
+// }
+
+const record = new Array(NUM_ROW)
+for(let rI = 0; rI < NUM_ROW; rI++) {
+  record[rI] = -1
+}
+
+function getAllAdjacents() {
+  // NOTE obsolete for now
+  // for(let rI = 0; rI < NUM_ROW; rI++) {
+  //   let lastColI = -1
+  //   for(let cI = 0; cI < NUM_COL / 2; cI++) {
+  //     if ( memory[rI][cI] ) lastColI = cI
+  //   }
+  //   record[rI] = lastColI
+  // }
+
+  const allAdjacents = []
+
+  for(let rI = 0; rI < NUM_ROW; rI++) {
+    // if it's next to vacant rows, no adjacent for this row.
+    if (isNextToVacantRows(rI)) continue;
+    // the one next to it is adjacent
+    let inadequacy = 1
+    // compare itself with surrounding rows to get more adjacent
+    if (rI === 0) {
+      const diffBelow = record[rI + 1] - record[rI]
+      inadequacy = Math.max(inadequacy, diffBelow)
+    } else if (rI === record.length - 1) {
+      const diffAbove = record[rI - 1] - record[rI]
+      inadequacy = Math.max(inadequacy, diffAbove)
+    } else {
+      const diffBelow = record[rI + 1] - record[rI]
+      const diffAbove = record[rI - 1] - record[rI]
+      inadequacy = Math.max(inadequacy, diffAbove, diffBelow)
+    }
+
+    for (let aI = 0; aI < inadequacy; aI++) {
+      allAdjacents.push(
+        [ record[rI] + aI + 1, rI ]
+      );
     }
   }
-  
-  let unchartedAdjacents = []
-  for (let i = 0; i < uniqueAdjacents.length; i++) {
-    const pos = uniqueAdjacents[i]
-    const appearance = memory.filter(el => el[0] === pos[0] && el[1] === pos[1])
-    if (appearance.length === 0) {
-      unchartedAdjacents.push(pos)
-    }
-  }
-  
-  const cell = unchartedAdjacents[Math.floor(Math.random() * unchartedAdjacents.length)]
+  return allAdjacents
+}
 
-  // pick vertices from them
-  // draw the thing
+function isNextToVacantRows(rI) {
+  let isAboveVacant, isBelowVacant;
+  if (rI === 0) {
+    isAboveVacant = true;
+    isBelowVacant = (record[rI+1] === -1)
+  } else if (rI === record.length - 1) {
+    isAboveVacant = (record[rI-1] === -1)
+    isBelowVacant = true;
+  } else {
+    isAboveVacant = (record[rI-1] === -1)
+    isBelowVacant = (record[rI+1] === -1)
+  }
+  return (isAboveVacant && isBelowVacant)
+}
+
+// seed the middle
+function init() {
+  const middleRow = Math.floor((record.length - 1) / 2)
+  record[middleRow] = 0
   new Path.Rectangle({
     point: [
-      view.size.width / 2 + cell[0] * CELL_SIZE,
-      view.size.height / 2 + cell[1] * CELL_SIZE,
+      view.size.width / 2 + (record[middleRow]) * GRID_SIZE,
+      middleRow * GRID_SIZE,
     ],
-    size: [CELL_SIZE, CELL_SIZE],
+    size: [GRID_SIZE, GRID_SIZE],
     strokeColor: STROKE_COLOR,
     strokeWidth: STROKE_WIDTH,
   })
   // symmetry
   new Path.Rectangle({
     point: [
-      view.size.width / 2 - cell[0] * CELL_SIZE,
-      view.size.height / 2 + cell[1] * CELL_SIZE,
+      view.size.width / 2 - (record[middleRow] + 1) * GRID_SIZE,
+      middleRow * GRID_SIZE,
     ],
-    size: [CELL_SIZE, CELL_SIZE],
+    size: [GRID_SIZE, GRID_SIZE],
     strokeColor: STROKE_COLOR,
     strokeWidth: STROKE_WIDTH,
   })
-  // remember
-  memory.push(cell)
-}
-global.step = step
 
-function getAdjacents(position) {
-  // 0, 0
-  const x = position[0]
-  const y = position[1]
-  return [
-    [x+1, y  ], // 1, 0
-    [x  , y+1], // 0, 1
-    [x+1, y+1], // 1, 1
-    [x  , y-1], // 0, -1
-    [x+1, y-1], // 1, -1
-  ]
 }
 
-// setInterval(step, 100)
-
-view.onFrame = function(event) {
-  step()
+function step() {
+  // paper.project.clear()
+  const allAdjacents = getAllAdjacents()
+  const randAdjacent = allAdjacents[Math.floor(Math.random() * allAdjacents.length)]
+  // draw
+  const column = randAdjacent[0]
+  const row = randAdjacent[1]
+  if (column === NUM_COL / 2 || row === NUM_ROW) return;
+  new Path.Rectangle({
+    point: [
+      view.size.width / 2 + column * GRID_SIZE,
+      row * GRID_SIZE,
+    ],
+    size: [GRID_SIZE, GRID_SIZE],
+    strokeColor: STROKE_COLOR,
+    strokeWidth: STROKE_WIDTH,
+  })
+  // symmetry
+  new Path.Rectangle({
+    point: [
+      view.size.width / 2 - (column + 1) * GRID_SIZE,
+      row * GRID_SIZE,
+    ],
+    size: [GRID_SIZE, GRID_SIZE],
+    strokeColor: STROKE_COLOR,
+    strokeWidth: STROKE_WIDTH,
+  })
+  // update record
+  updateRecord(column, row)
 }
+
+function updateRecord(column, row) {
+  if (column > NUM_COL / 2 - 1) return; // stop if column maxes out
+  record[row] = Math.max(record[row], column)
+}
+
+init()
+setInterval(step, 1)
