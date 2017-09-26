@@ -12,8 +12,8 @@ rect.sendToBack();
 rect.fillColor = 'black';
 
 const GRID_SIZE = 20
-const STROKE_WIDTH = 0.5
-const STROKE_COLOR = 'grey'
+const STROKE_WIDTH = 1
+const STROKE_COLOR = 'white'
 // put half of all possible grids into memory
 // when drawing, half is reflected
 const NUM_ROW = VIEW_SIZE / GRID_SIZE
@@ -122,8 +122,6 @@ const STEP_LIMIT = 200
 let stepsTaken = 0
 
 function step() {
-  if (stepsTaken > STEP_LIMIT) return;
-  stepsTaken += 1
   // paper.project.clear()
   const allAdjacents = getAllAdjacents()
   const randAdjacent = allAdjacents[Math.floor(Math.random() * allAdjacents.length)]
@@ -165,5 +163,17 @@ function updateRecord(column, row) {
   record[row] = Math.max(record[row], column)
 }
 
+const STEPS_EACH_FRAME = 10
+
+function multiStep() {
+  if (stepsTaken > STEP_LIMIT) return;
+  stepsTaken += STEPS_EACH_FRAME
+
+  for(let i = 0; i < STEPS_EACH_FRAME; i ++) {
+    step()
+  }
+  requestAnimationFrame(multiStep)
+}
+
 init()
-setInterval(step, 1)
+window.requestAnimationFrame(multiStep)
