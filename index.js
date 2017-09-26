@@ -117,14 +117,28 @@ function init() {
 
 }
 
+const DRAWING_PROBABILITY = 0.4
+const STEP_LIMIT = 200
+let stepsTaken = 0
+
 function step() {
+  if (stepsTaken > STEP_LIMIT) return;
+  stepsTaken += 1
   // paper.project.clear()
   const allAdjacents = getAllAdjacents()
   const randAdjacent = allAdjacents[Math.floor(Math.random() * allAdjacents.length)]
   // draw
   const column = randAdjacent[0]
   const row = randAdjacent[1]
+  // respect canvas border
   if (column === NUM_COL / 2 || row === NUM_ROW) return;
+  // update record
+  updateRecord(column, row)
+  // graph that shit
+  if (Math.random() > (1 - DRAWING_PROBABILITY)) draw(column, row)
+}
+
+function draw(column, row) {
   new Path.Rectangle({
     point: [
       view.size.width / 2 + column * GRID_SIZE,
@@ -144,8 +158,6 @@ function step() {
     strokeColor: STROKE_COLOR,
     strokeWidth: STROKE_WIDTH,
   })
-  // update record
-  updateRecord(column, row)
 }
 
 function updateRecord(column, row) {
