@@ -1,19 +1,27 @@
 const paper = require('paper')
 
+const lexicon = require('./lexicon')
+
 const VIEW_SIZE = 640
 paper.install(window)
 paper.setup('myCanvas')
 view.viewSize.set(VIEW_SIZE, VIEW_SIZE)
-var rect = new Path.Rectangle({
-  point: [0, 0],
-  size: [VIEW_SIZE, VIEW_SIZE],
-});
-rect.sendToBack();
-rect.fillColor = 'black';
+
+function paintBG() {
+  var rect = new Path.Rectangle({
+    point: [0, 0],
+    size: [VIEW_SIZE, VIEW_SIZE],
+  });
+  rect.sendToBack();
+  rect.fillColor = 'black';
+}
 
 const GRID_SIZE = 20
-const STROKE_WIDTH = 1
-const STROKE_COLOR = 'white'
+const STROKE_WIDTH = 0.5
+// const STROKE_COLOR = 'white'
+const STROKE_COLOR = null
+const FILL_COLOR = 'white'
+// const FILL_COLOR = null
 // put half of all possible grids into memory
 // when drawing, half is reflected
 const NUM_ROW = VIEW_SIZE / GRID_SIZE
@@ -32,21 +40,17 @@ const NUM_COL = VIEW_SIZE / GRID_SIZE
 //   }
 // }
 
-const record = new Array(NUM_ROW)
-for(let rI = 0; rI < NUM_ROW; rI++) {
-  record[rI] = -1
+function createRecord(){
+  const r = new Array(NUM_ROW)
+  for(let rI = 0; rI < NUM_ROW; rI++) {
+    r[rI] = -1
+  }
+  return r
 }
 
-function getAllAdjacents() {
-  // NOTE obsolete for now
-  // for(let rI = 0; rI < NUM_ROW; rI++) {
-  //   let lastColI = -1
-  //   for(let cI = 0; cI < NUM_COL / 2; cI++) {
-  //     if ( memory[rI][cI] ) lastColI = cI
-  //   }
-  //   record[rI] = lastColI
-  // }
+let record = createRecord()
 
+function getAllAdjacents() {
   const allAdjacents = []
 
   for(let rI = 0; rI < NUM_ROW; rI++) {
@@ -103,6 +107,7 @@ function init() {
     size: [GRID_SIZE, GRID_SIZE],
     strokeColor: STROKE_COLOR,
     strokeWidth: STROKE_WIDTH,
+    fillColor: FILL_COLOR,
   })
   // symmetry
   new Path.Rectangle({
@@ -113,12 +118,13 @@ function init() {
     size: [GRID_SIZE, GRID_SIZE],
     strokeColor: STROKE_COLOR,
     strokeWidth: STROKE_WIDTH,
+    fillColor: FILL_COLOR,
   })
 
 }
 
 const DRAWING_PROBABILITY = 0.4
-const STEP_LIMIT = 200
+const STEP_LIMIT = 150
 let stepsTaken = 0
 
 function step() {
@@ -145,6 +151,7 @@ function draw(column, row) {
     size: [GRID_SIZE, GRID_SIZE],
     strokeColor: STROKE_COLOR,
     strokeWidth: STROKE_WIDTH,
+    fillColor: FILL_COLOR,
   })
   // symmetry
   new Path.Rectangle({
@@ -155,6 +162,7 @@ function draw(column, row) {
     size: [GRID_SIZE, GRID_SIZE],
     strokeColor: STROKE_COLOR,
     strokeWidth: STROKE_WIDTH,
+    fillColor: FILL_COLOR,
   })
 }
 
@@ -175,5 +183,15 @@ function multiStep() {
   requestAnimationFrame(multiStep)
 }
 
+paintBG()
 init()
 window.requestAnimationFrame(multiStep)
+
+window.addEventListener('keydown', () => {
+  paper.project.clear()
+  paintBG()
+  stepsTaken = 0
+  record = createRecord()
+  init()
+  requestAnimationFrame(multiStep)
+})
