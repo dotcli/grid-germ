@@ -16,12 +16,12 @@ function paintBG() {
   rect.fillColor = 'black';
 }
 
-const GRID_SIZE = 16
+const GRID_SIZE = 20
 const STROKE_WIDTH = 0.5
-// const STROKE_COLOR = 'white'
-const STROKE_COLOR = null
-const FILL_COLOR = 'white'
-// const FILL_COLOR = null
+const STROKE_COLOR = 'white'
+// const STROKE_COLOR = null
+// const FILL_COLOR = 'white'
+const FILL_COLOR = null
 // put half of all possible grids into memory
 // when drawing, half is reflected
 const NUM_ROW = VIEW_SIZE / GRID_SIZE
@@ -110,6 +110,7 @@ function step() {
 
 function draw(column, row) {
   lexicon.drawSquare(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
+  lexicon.drawCircle(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
 }
 
 function updateRecord(column, row) {
