@@ -16,7 +16,7 @@ function paintBG() {
   rect.fillColor = 'black';
 }
 
-const GRID_SIZE = 20
+const GRID_SIZE = 16
 const STROKE_WIDTH = 0.5
 // const STROKE_COLOR = 'white'
 const STROKE_COLOR = null
@@ -26,19 +26,6 @@ const FILL_COLOR = 'white'
 // when drawing, half is reflected
 const NUM_ROW = VIEW_SIZE / GRID_SIZE
 const NUM_COL = VIEW_SIZE / GRID_SIZE
-
-// NOTE memory is obsolete;
-// tracking with record which tracks only the end
-// maybe this will be usefil in the future
-
-// const memory = new Array(NUM_ROW)
-// // fill them with falsehood
-// for(let rI = 0; rI < NUM_ROW; rI++) {
-//   memory[rI] = []
-//   for(let cI = 0; cI < NUM_COL / 2; cI++) {
-//     memory[rI].push(false)
-//   }
-// }
 
 function createRecord(){
   const r = new Array(NUM_ROW)
@@ -99,28 +86,7 @@ function isNextToVacantRows(rI) {
 function init() {
   const middleRow = Math.floor((record.length - 1) / 2)
   record[middleRow] = 0
-  new Path.Rectangle({
-    point: [
-      view.size.width / 2 + (record[middleRow]) * GRID_SIZE,
-      middleRow * GRID_SIZE,
-    ],
-    size: [GRID_SIZE, GRID_SIZE],
-    strokeColor: STROKE_COLOR,
-    strokeWidth: STROKE_WIDTH,
-    fillColor: FILL_COLOR,
-  })
-  // symmetry
-  new Path.Rectangle({
-    point: [
-      view.size.width / 2 - (record[middleRow] + 1) * GRID_SIZE,
-      middleRow * GRID_SIZE,
-    ],
-    size: [GRID_SIZE, GRID_SIZE],
-    strokeColor: STROKE_COLOR,
-    strokeWidth: STROKE_WIDTH,
-    fillColor: FILL_COLOR,
-  })
-
+  lexicon.drawSquare(0, middleRow, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
 }
 
 const DRAWING_PROBABILITY = 0.4
@@ -143,27 +109,7 @@ function step() {
 }
 
 function draw(column, row) {
-  new Path.Rectangle({
-    point: [
-      view.size.width / 2 + column * GRID_SIZE,
-      row * GRID_SIZE,
-    ],
-    size: [GRID_SIZE, GRID_SIZE],
-    strokeColor: STROKE_COLOR,
-    strokeWidth: STROKE_WIDTH,
-    fillColor: FILL_COLOR,
-  })
-  // symmetry
-  new Path.Rectangle({
-    point: [
-      view.size.width / 2 - (column + 1) * GRID_SIZE,
-      row * GRID_SIZE,
-    ],
-    size: [GRID_SIZE, GRID_SIZE],
-    strokeColor: STROKE_COLOR,
-    strokeWidth: STROKE_WIDTH,
-    fillColor: FILL_COLOR,
-  })
+  lexicon.drawSquare(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
 }
 
 function updateRecord(column, row) {
