@@ -1,19 +1,21 @@
 module.exports = {
   VIEW_SIZE: 640,
   // VIEW_COLOR: '#FCFAF2', // 白練
-  VIEW_COLOR: '#FFFFFB', // 胡粉
+  // VIEW_COLOR: '#FFFFFB', // 胡粉
+  VIEW_COLOR: '#42602D',
   GRID_SIZE: 20,
   GRID_MARGIN: 3,
   GRID_WIDTH: 0.15,
-  GRID_COLOR: '#1c1c1c', // 墨
+  // GRID_COLOR: '#1c1c1c', // 墨
+  GRID_COLOR: '#FCFAF2', // 白練
   STROKE_WIDTH: 1.5,
-  STROKE_COLOR: '#947A6D', // 胡桃
-  // STROKE_COLOR: '#808F7C',
+  // STROKE_COLOR: '#947A6D', // 胡桃
+  STROKE_COLOR: '#808F7C',
   // STROKE_COLOR: null,
   // FILL_COLOR: 'white',
   FILL_COLOR: null,
 
-  DRAWING_PROBABILITY: 0.6,
+  DRAWING_PROBABILITY: 0.7,
   STEP_LIMIT: 150,
   STEPS_EACH_FRAME: 4,
 }
