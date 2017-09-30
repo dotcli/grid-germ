@@ -1,4 +1,5 @@
 const paper = require('paper')
+paper.install(window)
 const lexicon = require('./lexicon')
 const config = require('./config')
 const {
@@ -17,7 +18,12 @@ const {
 } = config
 const NUM_ROW = VIEW_SIZE / GRID_SIZE
 const NUM_COL = VIEW_SIZE / GRID_SIZE
-paper.install(window)
+
+const documentColor = new Color(STROKE_COLOR)
+const b = new Color(0.1)
+const r = documentColor.multiply(b)
+document.body.style.backgroundColor = r.toCSS(true);
+
 paper.setup('myCanvas')
 view.viewSize.set(VIEW_SIZE, VIEW_SIZE)
 
