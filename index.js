@@ -1,8 +1,22 @@
 const paper = require('paper')
-
 const lexicon = require('./lexicon')
-
-const VIEW_SIZE = 640
+const config = require('./config')
+const {
+  VIEW_SIZE,
+  GRID_SIZE,
+  VIEW_COLOR,
+  GRID_COLOR,
+  GRID_MARGIN,
+  GRID_WIDTH,
+  STROKE_WIDTH,
+  STROKE_COLOR,
+  FILL_COLOR,
+  DRAWING_PROBABILITY,
+  STEP_LIMIT,
+  STEPS_EACH_FRAME,
+} = config
+const NUM_ROW = VIEW_SIZE / GRID_SIZE
+const NUM_COL = VIEW_SIZE / GRID_SIZE
 paper.install(window)
 paper.setup('myCanvas')
 view.viewSize.set(VIEW_SIZE, VIEW_SIZE)
@@ -13,19 +27,17 @@ function paintBG() {
     size: [VIEW_SIZE, VIEW_SIZE],
   });
   rect.sendToBack();
-  rect.fillColor = 'black';
+  rect.fillColor = VIEW_COLOR;
+  // OPTIONAL paint it with grid
+  for(let rI = 0; rI < NUM_ROW; rI++) {
+    for(let cI = 0; cI < NUM_COL / 2; cI++) {
+      lexicon.drawSquare(cI, rI, GRID_SIZE, GRID_COLOR, GRID_WIDTH, FILL_COLOR)
+    }
+  }
 }
 
-const GRID_SIZE = 20
-const STROKE_WIDTH = 0.5
-const STROKE_COLOR = 'white'
-// const STROKE_COLOR = null
-// const FILL_COLOR = 'white'
-const FILL_COLOR = null
 // put half of all possible grids into memory
 // when drawing, half is reflected
-const NUM_ROW = VIEW_SIZE / GRID_SIZE
-const NUM_COL = VIEW_SIZE / GRID_SIZE
 
 function createRecord(){
   const r = new Array(NUM_ROW)
@@ -86,11 +98,8 @@ function isNextToVacantRows(rI) {
 function init() {
   const middleRow = Math.floor((record.length - 1) / 2)
   record[middleRow] = 0
-  lexicon.drawSquare(0, middleRow, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
 }
 
-const DRAWING_PROBABILITY = 0.4
-const STEP_LIMIT = 150
 let stepsTaken = 0
 
 function step() {
@@ -100,17 +109,22 @@ function step() {
   // draw
   const column = randAdjacent[0]
   const row = randAdjacent[1]
-  // respect canvas border
-  if (column === NUM_COL / 2 || row === NUM_ROW) return;
+  // respect canvas border & margin
+  if (column === NUM_COL / 2 - GRID_MARGIN || 
+    row === NUM_ROW - GRID_MARGIN || 
+    row === GRID_MARGIN) return;
   // update record
   updateRecord(column, row)
   // graph that shit
-  if (Math.random() > (1 - DRAWING_PROBABILITY)) draw(column, row)
+  if (Math.random() < DRAWING_PROBABILITY) draw(column, row)
 }
 
 function draw(column, row) {
-  lexicon.drawSquare(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
-  lexicon.drawCircle(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
+  // if (Math.random() < 0.3) lexicon.drawSquare(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
+  if (Math.random() < 1) {
+    if (Math.random() < 0.5) lexicon.drawCircle(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
+    else lexicon.drawCircle(column, row, GRID_SIZE * Math.sqrt(2), STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
+  }
 }
 
 function updateRecord(column, row) {
@@ -118,7 +132,6 @@ function updateRecord(column, row) {
   record[row] = Math.max(record[row], column)
 }
 
-const STEPS_EACH_FRAME = 10
 
 function multiStep() {
   if (stepsTaken > STEP_LIMIT) return;

@@ -1,6 +1,17 @@
 /**
  * A collection of rendering methods
  */
+const config = require('./config')
+const {
+  VIEW_SIZE,
+  GRID_SIZE,
+  STROKE_WIDTH,
+  STROKE_COLOR,
+  FILL_COLOR,
+  DRAWING_PROBABILITY,
+  STEP_LIMIT,
+  STEPS_EACH_FRAME,
+} = config
 
 module.exports = {
   // simple square filling the grid 
@@ -12,15 +23,15 @@ module.exports = {
     }
     const rightStyle = Object.assign({
       point: [
-        view.size.width / 2 + column * size,
-        row * size,
+        VIEW_SIZE / 2 + column * GRID_SIZE,
+        row * GRID_SIZE,
       ],
       size: [size, size],
     }, style)
     const leftStyle = Object.assign({
       point: [
-        view.size.width / 2 - (column + 1) * size,
-        row * size,
+        VIEW_SIZE / 2 - (column + 1) * GRID_SIZE,
+        row * GRID_SIZE,
       ],
       size: [size, size],
     }, style)
@@ -36,15 +47,15 @@ module.exports = {
     }
     const rightStyle = Object.assign({
       center: [
-        view.size.width / 2 + (column + 0.5) * size,
-        (row + 0.5) * size,
+        VIEW_SIZE / 2 + (column + 0.5) * GRID_SIZE,
+        (row + 0.5) * GRID_SIZE,
       ],
       radius: size / 2,
     }, style)
     const leftStyle = Object.assign({
       center: [
-        view.size.width / 2 - (column + 0.5) * size,
-        (row + 0.5) * size,
+        VIEW_SIZE / 2 - (column + 0.5) * GRID_SIZE,
+        (row + 0.5) * GRID_SIZE,
       ],
       radius: size / 2,
     }, style)
