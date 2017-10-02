@@ -15,7 +15,7 @@ module.exports = {
   // FILL_COLOR: 'white',
   FILL_COLOR: null,
 
-  DRAWING_PROBABILITY: 0.7,
+  DRAWING_PROBABILITY: 0.2,
   STEP_LIMIT: 150,
   STEPS_EACH_FRAME: 4,
 }

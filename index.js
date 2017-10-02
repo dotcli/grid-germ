@@ -126,11 +126,9 @@ function step() {
 }
 
 function draw(column, row) {
-  if (Math.random() < 0.2) lexicon.drawSquare(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
-  if (Math.random() < 0.8) {
-    if (Math.random() < 0.5) lexicon.drawCircle(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
-    else lexicon.drawCircle(column, row, GRID_SIZE * Math.sqrt(2), STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
-  }
+  lexicon.drawStroke(column, row, ['topInner', 'bottomInner', 'topOuter', 'topInner'])
+  // lexicon.drawSquare(column, row, GRID_SIZE, STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
+  // lexicon.drawCircle(column, row, GRID_SIZE * Math.sqrt(2), STROKE_COLOR, STROKE_WIDTH, FILL_COLOR)
 }
 
 function updateRecord(column, row) {
